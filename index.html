@@ -322,7 +322,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 
   // ── demo data (?demo=1): sample nights for previews and training; nothing is saved
   function demo(action, b) {
-    var t = new Date(); function plus(n) { var d = new Date(t); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); }
+    var t = new Date(); function plus(n) { var d = new Date(t); d.setDate(d.getDate() + n); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
     var dow = t.getDay(), toThu = (4 - dow + 7) % 7 || 7;
     var shows = [
       { id: 101, name: 'Bass Bingo', date: plus(toThu), venue: 'Vinyl', series: 'Vinyl Thursdays', doors: '9:00 PM', age: '21+', lineup: ['Resident DJ', 'Bingo host'], blurb: 'Bass music, bingo cards and prizes every round.', flyer: '', tickets: '', guestList: { open: true, terms: 'Free before 11 PM with RSVP. 21+ with valid ID.', maxPlus: 1, spotsLeft: 12, low: true } },
