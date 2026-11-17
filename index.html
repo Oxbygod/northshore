@@ -216,8 +216,8 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
           '<p class="sub">' + esc(gl.terms || 'Free entry on the list, subject to capacity.') + '</p>' +
           (gl.low ? '<div class="spots">ONLY ' + gl.spotsLeft + ' SPOTS LEFT</div>' : '') +
           '<div class="field"><label for="nm">Full name (as on your ID)</label><input id="nm" autocomplete="name" required maxlength="60"></div>' +
-          '<div class="field"><label for="em">Email</label><input id="em" type="email" autocomplete="email" inputmode="email" required maxlength="120"></div>' +
-          '<div class="field"><label for="ph">Mobile (optional)</label><input id="ph" type="tel" autocomplete="tel" inputmode="tel" maxlength="20"></div>' +
+          '<div class="field"><label for="ph">Mobile</label><input id="ph" type="tel" autocomplete="tel" inputmode="tel" required maxlength="20" placeholder="(412) 555-0123"></div>' +
+          '<div class="field"><label for="em">Email (optional, we’ll send your pass)</label><input id="em" type="email" autocomplete="email" inputmode="email" maxlength="120"></div>' +
           (gl.maxPlus > 0 ? '<div class="field"><label for="pl">Bringing</label><select id="pl"><option value="0">Just me</option>' +
             Array.from({ length: gl.maxPlus }, function (_, i) { return '<option value="' + (i + 1) + '">Me +' + (i + 1) + '</option>'; }).join('') + '</select></div>' : '') +
           '<div class="hp" aria-hidden="true"><label>Leave blank<input id="hp" tabindex="-1" autocomplete="off"></label></div>' +
@@ -240,14 +240,16 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     var btn = document.getElementById('go'), er = document.getElementById('er');
     var body = { id: s.id, name: val('nm'), email: val('em'), phone: val('ph'), plus: Number(val('pl') || 0), optIn: document.getElementById('op').checked, hp: val('hp') };
     if (body.name.trim().split(/\s+/).length < 2) { er.textContent = 'Enter your first and last name as it appears on your ID.'; return; }
-    if (!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(body.email.trim())) { er.textContent = 'Enter a valid email so we can send your pass.'; return; }
+    var digits = body.phone.replace(/\D/g, ''); if (digits.length === 11 && digits[0] === '1') digits = digits.slice(1);
+    if (digits.length < 10 || digits.length > 15) { er.textContent = 'Enter a valid mobile number.'; return; }
+    if (body.email.trim() && !/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(body.email.trim())) { er.textContent = 'That email doesn’t look right. Fix it or leave it blank.'; return; }
     er.textContent = ''; btn.disabled = true; btn.textContent = 'Adding you…';
     call('rsvp', body).then(function (res) {
       if (!res.ok || !res.pass) { er.textContent = (res && res.error) || 'Something went wrong. Try again.'; btn.disabled = false; btn.textContent = 'Get my pass'; return; }
       track('rsvp');
       rememberPass(res.pass);
       history.pushState({}, '', './?pass=' + res.pass.code + (DEMO ? '&demo=1' : ''));
-      passView(res.pass, res.existing ? 'You were already on the list. Here’s your pass.' : (res.pass.emailed ? 'You’re in. We also emailed this pass to you.' : 'You’re in. Screenshot this pass or bookmark this page.'));
+      passView(res.pass, res.existing ? 'You were already on the list. Here’s your pass.' : (res.pass.emailed ? 'You’re in. We also emailed this pass to you.' : 'You’re in. Screenshot this pass. It’s also saved under My passes on this phone.'));
       window.scrollTo(0, 0);
     });
   }
